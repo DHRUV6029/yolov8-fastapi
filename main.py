@@ -14,7 +14,7 @@ from fastapi.exceptions import HTTPException
 from io import BytesIO
 
 from app import get_image_from_bytes
-from app import detect_sample_model
+from app import detect_model
 from app import add_bboxs_on_img
 from app import get_bytes_from_image
 
@@ -33,9 +33,9 @@ logger.add("log.log", rotation="1 MB", level="DEBUG", compression="zip")
 
 # title
 app = FastAPI(
-    title="Object Detection FastAPI Template",
+    title="YOLO_Object_Detection_API",
     description="""Obtain object value out of image
-                    and return image and json result""",
+                    and return image and json result using yolo model of different size""",
     version="2023.1.31",
 )
 
@@ -125,7 +125,7 @@ def crop_image_by_predict(image: Image, predict: pd.DataFrame(), crop_class_name
 
 
 @app.post("/img_object_detection_to_json")
-def img_object_detection_to_json(file: bytes = File(...)):
+def img_object_detection_to_json(file: bytes = File(...) , model_name = 'yolov8n.pt'):
     """
     Object Detection from an image.
 
@@ -141,7 +141,7 @@ def img_object_detection_to_json(file: bytes = File(...)):
     input_image = get_image_from_bytes(file)
 
     # Step 3: Predict from model
-    predict = detect_sample_model(input_image)
+    predict = detect_model(input_image , model_name)
 
     # Step 4: Select detect obj return info
     # here you can choose what data to send to the result
@@ -156,7 +156,7 @@ def img_object_detection_to_json(file: bytes = File(...)):
     return result
 
 @app.post("/img_object_detection_to_img")
-def img_object_detection_to_img(file: bytes = File(...)):
+def img_object_detection_to_img(file: bytes = File(...),model_name= 'yolov8n.pt'):
     """
     Object Detection from an image plot bbox on image
 
@@ -169,7 +169,7 @@ def img_object_detection_to_img(file: bytes = File(...)):
     input_image = get_image_from_bytes(file)
 
     # model predict
-    predict = detect_sample_model(input_image)
+    predict = detect_model(input_image , model_name)
 
     # add bbox on image
     final_image = add_bboxs_on_img(image = input_image, predict = predict)

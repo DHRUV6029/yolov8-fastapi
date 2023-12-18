@@ -9,8 +9,14 @@ from ultralytics import YOLO
 from ultralytics.yolo.utils.plotting import Annotator, colors
 
 
-# Initialize the models
-model_sample_model = YOLO("./models/sample_model/yolov8n.pt")
+model_path = None
+# Initialize the models config
+
+def config_model(model_name):
+    global model_path
+    model_path_refrence = "./models/Yolo_model/"+str(model_name)
+    model_path = YOLO(model_path_refrence)
+
 
 
 def get_image_from_bytes(binary_image: bytes) -> Image:
@@ -128,9 +134,9 @@ def add_bboxs_on_img(image: Image, predict: pd.DataFrame()) -> Image:
 ################################# Models #####################################
 
 
-def detect_sample_model(input_image: Image) -> pd.DataFrame:
+def detect_model(input_image: Image  , model_name: str) -> pd.DataFrame:
     """
-    Predict from sample_model.
+    Predict from model.
     Base on YoloV8
 
     Args:
@@ -139,8 +145,10 @@ def detect_sample_model(input_image: Image) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame containing the object location.
     """
+    #model config param
+    config_model(model_name)
     predict = get_model_predict(
-        model=model_sample_model,
+        model=model_path,
         input_image=input_image,
         save=False,
         image_size=640,
